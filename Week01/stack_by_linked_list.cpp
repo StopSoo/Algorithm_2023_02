@@ -10,19 +10,22 @@ private:
         itemType key;
         struct node *next;
     };
-    struct node *head;
+    struct node *head = new node;   // 시작 노드 할당
 public:
     Stack2() {    // 생성자
-        head = new node;
+        // 노드의 변수들을 초기화
+        head->key = 0;
         head->next = NULL;
     }
-    ~Stack2() {     // 소멸자 (모든 노드들의 메모리 해제)
+    ~Stack2() {     // 소멸자
+        // 모든 노드들의 메모리 해제
         while (head) {
             node *temp;
             temp = head;
             head = head->next;
             delete temp;
         }
+        // 시작 노드 메모리 해제
         delete head;
     }
     void push (itemType value) {
@@ -35,8 +38,8 @@ public:
             new_node->next = NULL;  // new_node이 next를 NULL로 초기화
             return;
         } else {
-            temp = head->next;  // temp 노드를 head->next로 초기화
-            while (temp->next != NULL) {    // 끝까지 이동
+            temp = head;  // temp 노드를 head->next로 초기화
+            while (temp->next != NULL) {    // 다음 노드가 NULL이 아닐 때까지 끝까지 이동
                 temp = temp->next;
             }
             temp->next = new_node;  // 연결 리스트의 끝에 새로운 노드 삽입
@@ -49,7 +52,7 @@ public:
         node *prev;
         itemType key;
         if (head->next != NULL) {   // 노드가 1개가 아니라면
-            temp = head->next;
+            temp = head;
             while (temp->next != NULL) {    // 맨 끝으로 간다.
                 prev = temp;
                 temp = temp->next;
