@@ -9,4 +9,6 @@ include_directories(Week01)
 
 add_executable(Algorithm_2023_02
 #        Week01/stack_by_array_to_double.cpp
-        Week01/stack_by_linked_list.cpp)
+#        Week01/stack_by_linked_list.cpp
+#        Week02/array_insertion_sort.cpp
+        Week02/array_bubble_sort.cpp)
