@@ -1,31 +1,41 @@
-// Q. 정렬하려는 배열의 크기 N ( >10000 ) 을 입력 받아, 아래와 같은 두 가지 데이터 배열 A와 B를 만들고,
-//    이 데이터 배열 A와 B 각각에 대해 Insertion Sort를 통해 오름차순으로 정렬시켜주는 프로그램을 작성하시오.
-//    이 때, 정렬된 결과 뿐만 아니라 정렬 과정에서의 데이터 비교 연산 횟수와 자료 이동 연산 횟수 또한 아래의 입출력 예제와 같이 출력되어야 한다.
-
+// Q. 정렬하려는 배열의 크기 N(> 10000)을 입력 받아, 문제 1번과 동일한 방법으로 데이터 A와 데이터 B를 생성하고,
+//    이 데이터 배열 A, B 각각에 대해 Shell Sort를 이용해 오름차순으로 정렬시켜주는 프로그램을 작성하시오.
+//    이 때, 정렬된 결과 뿐만 아니라 정렬 과정에서의 데이터 비교 연산 회수와 자료 이동 연산 회수 또한 아래의 입출력 예제와 같이 출력되어야 한다.
 #include <iostream>
 #include <time.h>
 using namespace std;
 
-// 삽입 정렬 함수
+// 쉘 정렬 함수
 template <typename itemType>
-tuple<itemType, itemType> insertion(itemType a[],  int n)    // 매개변수 : 배열, 배열의 크기
+tuple<itemType, itemType> shellSort(itemType a[], int n) // 정렬하려는 배열, 배열의 크기
 {
-    int i, j;
-    itemType v;
+    int i, j, h;
+    itemType temp;
+    h = 1;  // 부분 배열 내 원소들이 떨어진 거리 초기화
     int compare = 0, move = 0;  // 데이터 비교 횟수, 자료 이동 횟수
-    for (i = 1; i < n; i++)
-    {
-        v = a[i];
-        for (j = i-1; j >=0; j--) {
-            compare++;  // 데이터 비교 발생
-            if (a[j] > v) {
-                a[j+1] = a[j];
-                move++; // 자료 이동 발생
-            } else break;
-        }
-        a[j+1] = v;
-        move++;
+    while (h < n / 3) {
+        h = 3 * h + 1;
     }
+    do {
+        for (i = h; i < n; i++)
+        {
+            temp = a[i];
+            j = i;
+            compare++;  // 데이터 비교 횟수 증가
+            while (a[j-h] > temp)
+            {
+                a[j] = a[j-h];
+                move++; // 자료 이동 횟수 증가
+                j -= h;
+                if (j < h-1)
+                    break;
+                compare++;  // 데이터 비교 횟수 증가
+            }
+            a[j] = temp;
+            move++; // 자료 이동 횟수 증가
+        }
+        h = h / 2;  // 부분 배열 내 거리 재설정
+    } while (h > 0);
 
     return {compare, move}; // 데이터 비교 횟수, 자료 이동 횟수 반환
 }
@@ -54,9 +64,9 @@ int main() {
         swap(B[x], B[y]);
     }
 
-    // 2. 배열 A와 B에 대해 삽입 정렬을 이용해 오름차순으로 정렬하기
+    // 2. 배열 A와 B에 대해 쉘 정렬을 이용해 오름차순으로 정렬하기
     tuple<int, int> result = {};
-    result = insertion(A, N);   // 연산 횟수 튜플 받기
+    result = shellSort(A, N);   // 연산 횟수 튜플 받기
     int compare_A = get<0>(result); // 배열 A의 데이터 비교 연산 횟수 받기
     int move_A = get<1>(result);    // 배열 A의 자료 이동 연산 횟수 받기
     cout << "SortedData A: ";
@@ -65,7 +75,7 @@ int main() {
     }
     cout << endl;
 
-    result = insertion(B, N);   // 연산 횟수 튜플 받기
+    result = shellSort(B, N);   // 연산 횟수 튜플 받기
     int compare_B = get<0>(result); // 배열 B의 데이터 비교 연산 횟수 받기
     int move_B = get<1>(result);    // 배열 B의 자료 이동 연산 횟수 받기
     cout << "SortedData B: ";
