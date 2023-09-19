@@ -24,7 +24,7 @@ tuple<itemType, itemType> bubbleSort(itemType a[], int n)    // 정렬하고자 
 {
     int i, j, Sorted;   // 제어 변수, 정렬 여부 변수
     Sorted = false; // 정렬 여부
-    int compare = 0, move = 0;  // 데이터 비교 횟수, 자료 이동 횟수
+    int64_t compare = 0, move = 0;  // 데이터 비교 횟수, 자료 이동 횟수 -> N이 커서 자료형을 int에서 int_64로 변경
     while (!Sorted) {
         Sorted = true;
         for (i = 0; i < n; i++) {
