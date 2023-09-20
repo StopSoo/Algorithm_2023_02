@@ -49,19 +49,28 @@ int insertion(int *a,  int n)    // 매개변수 : 배열, 배열의 크기
     int i, j;   // 제어 변수
     int v;  // 타겟 물건
     int total_weight = 0;   // 물건들의 무게의 합
+    bool switched = false;
     for (i = 1; i < n; i++)
     {
         v = a[i];
         for (j = i-1; j >=0; j--) {
             if (a[j] > v) {
-                // swap 개념인데 ... 수정 필요 !!
+                // 교환 여부
+                switched = true;
+                // 한 칸 뒤로 옮기기
                 a[j+1] = a[j];
-                // 이동되는 물건들의 최소 무게 합을 총 무게 합에 더해준다.
-                // 삽입 정렬이어도 두 물건씩 서로 바꾼다는 전제 하에 !
-                total_weight += (min(a[j], v)*2 + max(a[j], v));
+                // 이동되는 물건들만 일단 최종 합에 더함
+                total_weight += a[j];
             } else break;
         }
+
+        if (switched == true) { // 물건들의 위치가 교환되었을 경우
+            a[j+1] = v;
+            total_weight += v * 2;  // 처음에 빈 자리로 옮길 때, 마지막에 최종 자리로 옮길 때 (총 2번)
+            switched = false;
+        } else continue;
     }
+
     return total_weight;
 }
 
@@ -72,6 +81,7 @@ int shellSort(int *a, int n) // 정렬하려는 배열, 배열의 크기
     int temp;
     h = 1;  // 부분 배열 내 원소들이 떨어진 거리 초기화
     int total_weight = 0;   // 물건들의 무게의 합
+    bool switched = false;
     while (h < n / 3) {
         h = 3 * h + 1;
     }
@@ -82,12 +92,21 @@ int shellSort(int *a, int n) // 정렬하려는 배열, 배열의 크기
             j = i;
             while (a[j-h] > temp)
             {
+                // 교환 여부
+                switched = true;
                 a[j] = a[j-h];
+                // 이동되는 물건들만 일단 최종 합에 더함
+                total_weight += a[j];
                 j -= h;
                 if (j < h-1)
                     break;
             }
-            a[j] = temp;
+
+            if (switched == true) { // 물건들의 위치가 교환되었을 경우
+                a[j] = temp;
+                total_weight += a[j] * 2;  // 처음에 빈 자리로 옮길 때, 마지막에 최종 자리로 옮길 때 (총 2번)
+                switched = false;
+            } else continue;
         }
         h = h / 2;  // 부분 배열 내 거리 재설정
     } while (h > 0);
@@ -101,9 +120,17 @@ int main() {
     cin >> N;   // 사용자로부터 배열의 크기 입력 받기
 
     // 배열 생성 및 동적 할당
-    int *arr = new int[N];
+    int *arr_bubble = new int[N];
     for (int i = 0; i < N; i++) {   // 배열 arr를 물건의 무게로 초기화
-        arr[i] = N - (i + 1) + 1;
+        arr_bubble[i] = N - (i + 1) + 1;
+    }
+    int *arr_insertion = new int[N];
+    for (int i = 0; i < N; i++) {   // 배열 arr를 물건의 무게로 초기화
+        arr_insertion[i] = N - (i + 1) + 1;
+    }
+    int *arr_shell = new int[N];
+    for (int i = 0; i < N; i++) {   // 배열 arr를 물건의 무게로 초기화
+        arr_shell[i] = N - (i + 1) + 1;
     }
 
     // 무게 합에 대한 정렬 별 변수 선언
@@ -112,9 +139,9 @@ int main() {
     int total_weight_shell;   // 버블 정렬 - 물건들의 무게의 최종 합
 
     // 배열 arr에 대해 정렬 별 계산
-    total_weight_bubble = bubbleSort(arr, N);
-    total_weight_insertion = insertion(arr, N);
-    total_weight_shell = shellSort(arr, N);
+    total_weight_insertion = insertion(arr_insertion, N);
+    total_weight_bubble = bubbleSort(arr_bubble, N);
+    total_weight_shell = shellSort(arr_shell, N);
 
     // 이동된 물건들의 무게 합을 각각의 정렬에 대해 출력하기
     cout << "Insertion Sort : " <<  total_weight_insertion << endl;
@@ -122,6 +149,8 @@ int main() {
     cout << "Shell Sort : " <<  total_weight_shell << endl;
 
     // 메모리 해제
-    delete [] arr;
+    delete [] arr_bubble;
+    delete [] arr_insertion;
+    delete [] arr_shell;
     return 0;
 }
