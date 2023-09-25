@@ -6,12 +6,22 @@
 #include <sstream>
 #include <string>
 #include <list>
+#include <algorithm>
 using namespace std;
+
+bool compare(const pair<string, int> &a, const pair<string, int> &b)
+{
+    if (a.second != b.second) { // 단어의 빈도 수가 같지 않다면 빈도 수 내림차순으로 정렬
+        return a.second > b.second;
+    } else {    // 단어의 빈도 수가 같다면 단어를 오름차순으로 정렬
+        return a.first < b.first;
+    }
+}
 
 int main() {
     string line;    // 파일에서 읽어온 문장을 저장할 string 변수 선언
     list<string> words; // 구분한 단어들을 저장할 리스트 선언
-    ifstream file("Week03/datafile.txt");  // 파일 읽어오기 -> 경로 수정할 것
+    ifstream file("datafile.txt");  // 파일 읽어오기 -> 경로 수정할 것
     if (file.is_open()) {
         // 1. 파일에 저장되어 있는 텍스트를 불러와서 한 문장씩 받아 공백으로 구분 후 리스트에 저장
         while (getline(file, line)) {   // file에서 한 문장씩 받아와 string 변수 line에 저장
@@ -30,17 +40,34 @@ int main() {
                 *iter = (*iter).substr(0, (*iter).find(','));
             }
             if ((*iter).find('/') != string::npos) {
-                words.push_back((*iter).substr(0, (*iter).find('/')));
-                *iter = (*iter).substr((*iter).find('/')+1, (*iter).length()-((*iter).find('/')+1));
+                words.push_back((*iter).substr(0, (*iter).find('/')));  // '/' 앞 문자 저장
+                *iter = (*iter).substr((*iter).find('/')+1, (*iter).length()-((*iter).find('/')+1));    // '/' 뒤 문자 저장
             }
         }
-        // 확인용 출력
+
+        // 3. 단어의 빈도 수 구하기
+        vector<pair<string, int>> counts;
+        // 모든 단어들의 빈도 수를 0으로 해서 딕셔너리에 넣기
         for (iter = words.begin(); iter != words.end(); iter++) {
-            cout << *iter << endl;
+            counts.push_back(make_pair(*iter, 0));
         }
-
-        // 3. 단어의 빈도수 구하기
-
+        // 중복 제거를 위한 작업
+        sort(counts.begin(), counts.end());
+        counts.erase(unique(counts.begin(), counts.end()), counts.end());
+        // 각각의 단어들의 빈도 수 체크
+        for (iter = words.begin(); iter != words.end(); iter++) {
+            for (int i = 0; i < counts.size(); i++) {
+                if (counts[i].first == *iter) {
+                    counts[i].second++;
+                }
+            }
+        }
+        // 4. 정해진 기준(함수 compare)으로 정렬하기
+        sort(counts.begin(), counts.end(), compare);
+        // 출력
+        for (int i=0; i < counts.size(); i++) {
+            cout << counts[i].first << " " << counts[i].second << endl;
+        }
         file.close();   // 파일 닫기
     } else {
         cout << "파일을 열 수 없습니다.";
