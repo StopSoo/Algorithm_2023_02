@@ -3,6 +3,7 @@
 //    이때, 정렬된 결과뿐만 아니라 정렬 과정에서의 데이터비교 연산회수와 자료이동 연산회수 또한 아래의 입출력 예제와 같이 출력되어야 한다.
 #include <iostream>
 #include <time.h>
+#include <tuple>
 using namespace std;
 
 // 버블 정렬 함수

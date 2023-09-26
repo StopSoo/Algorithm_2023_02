@@ -3,6 +3,7 @@
 //    이 때, 정렬된 결과 뿐만 아니라 정렬 과정에서의 데이터 비교 연산 회수와 자료 이동 연산 회수 또한 아래의 입출력 예제와 같이 출력되어야 한다.
 #include <iostream>
 #include <time.h>
+#include <tuple>
 using namespace std;
 
 // 쉘 정렬 함수

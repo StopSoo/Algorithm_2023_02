@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <time.h>
+#include <tuple>
 using namespace std;
 
 // 삽입 정렬 함수
