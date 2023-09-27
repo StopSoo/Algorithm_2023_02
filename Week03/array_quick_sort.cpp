@@ -2,6 +2,8 @@
 //    이 데이터 배열 A와 B 각각에 대해 Quick Sort를 통해 오름차순으로 정렬시켜주는 프로그램을 작성하시오.
 //    이 때, 정렬된 결과 뿐만 아니라 정렬 과정에서의 데이터 비교 연산회수와 자료 이동 연산회수 또한 아래의 입출력 예제와 같이 출력되어야 한다.
 #include <iostream>
+#include <tuple>
+#include <time.h>
 using namespace std;
 
 // 퀵 정렬 함수
@@ -18,6 +20,7 @@ tuple<int, itemType, itemType> partition(itemType a[], int l, int r) {
     int i, j;
     itemType v;
     int64_t compare = 0, move = 0;  // 데이터 비교 횟수, 자료 이동 횟수 -> N이 커서 자료형을 int에서 int_64로 변경
+
     compare++;  // 데이터 비교 연산
     if (r > l) {    // right > left
         v = a[l];
@@ -25,13 +28,15 @@ tuple<int, itemType, itemType> partition(itemType a[], int l, int r) {
         j = r+1;
         for (;;) {
             while (a[++i] < v) { compare++; };    // 데이터 비교 연산
+            compare++;  // while문을 빠져나왔을 때의 데이터 비교 연산 횟수
             while (a[--j] > v) { compare++; };    // 데이터 비교 연산
+            compare++;  // while문을 빠져나왔을 때의 데이터 비교 연산 횟수
             if (i >= j) break;
             swap(a, i, j);
-            move++; // 자료 이동 연산 (한 번으로 취급)
+            move += 3; // 자료 이동 연산
         }
         swap(a, j, l);
-        move++;  // 자료 이동 연산 (한 번으로 취급)
+        move += 3;  // 자료 이동 연산
     }
     return {j, compare, move};
 }

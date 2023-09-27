@@ -7,6 +7,8 @@
 #include <string>
 #include <list>
 #include <algorithm>
+#include <tuple>
+#include <vector>
 using namespace std;
 
 bool compare(const pair<string, int> &a, const pair<string, int> &b)
@@ -62,6 +64,7 @@ int main() {
                 }
             }
         }
+
         // 4. 정해진 기준(함수 compare)으로 정렬하기
         sort(counts.begin(), counts.end(), compare);
         // 출력
