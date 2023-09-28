@@ -7,58 +7,50 @@
 using namespace std;
 
 // 합병 정렬 함수
-template <typename itemType>
-tuple<int, int> merge(itemType a[], int l, int mid, int r, int& c, int& m) {
+typedef int itemType;
+itemType* sorted;       // 합병 정렬 배열을 전역 변수로 선언
+
+void merge(itemType a[], int l, int mid, int r, unsigned int& c, unsigned int& m) {
     int i, j, k, n;
     i = l;
     j = mid + 1;
     k = l;  // 합병 정렬 배열의 인덱스
-    n = sizeof(a) / sizeof(itemType);   // 배열 a의 사이즈 체크
-    int compare_sum = 0, move_sum = 0;
-
-    itemType* sorted = new itemType[n]; // 합병 정렬 결과를 담을 배열
 
     while (i <= mid && j <= r) {
-        compare_sum++;  // 데이터 비교 연산
+        c++;  // 데이터 비교 연산
         if (a[i] <= a[j]) { // 양쪽 배열 원소 중 왼쪽 원소가 더 작거나 같다면
             sorted[k++] = a[i++];   // 합병 정렬 배열에 왼쪽 원소 대입
         } else {    // 오른쪽 원소가 더 작다면
             sorted[k++] = a[j++];   // 합병 정렬 배열에 오른쪽 원소 대입
         }
-        move_sum++; // 자료 이동 연산
+        m++; // 자료 이동 연산
     }
 
     if (i > mid)    // 왼쪽 배열을 합병 정렬 배열에 모두 넣었다면
         for (n = j; n <= r; n++) {   // 오른쪽 배열의 모든 원소를 합병 정렬 배열에 대입
             sorted[k++] = a[n];
-            move_sum++; // 자료 이동 연산
+            m++; // 자료 이동 연산
         }
     else            // 오른쪽 배열을 합병 정렬 배열에 모두 넣었다면
         for (n = i; n <= mid; n++) { // 왼쪽 배열의 모든 원소를 합병 정렬 배열에 대입
             sorted[k++] = a[n];
-            move_sum++; // 자료 이동 연산
+            m++; // 자료 이동 연산
         }
 
     for (n=l; n<=r; n++) {  // 정렬된 배열을 위치에 맞게 배열 a에 다시 대입
         a[n] = sorted[n];
     }
-
-    delete [] sorted;
-    return {compare_sum, move_sum};
 }
 
 template <typename itemType>
-void mergesort(itemType a[], int l, int r, int& c, int&m) {
+void mergesort(itemType a[], int l, int r, unsigned int& c, unsigned int& m) {
     int mid;
     tuple<int, int> result;
     if (l < r) {
         mid = (l + r) / 2;
         mergesort(a, l, mid, c, m);   // 앞 부분 정렬
         mergesort(a, mid+1, r, c, m); // 뒷 부분 정렬
-        result = merge(a, l, mid, r, c, m); // 두 배열 합병
-        // 데이터 비교 연산 횟수, 자료 이동 연산 횟수를 변수에 담기
-        c += get<0>(result);
-        m += get<1>(result);
+        merge(a, l, mid, r, c, m); // 두 배열 합병
     }
 }
 
@@ -87,7 +79,9 @@ int main() {
     }
 
     // 2. 배열 A와 B에 대해 합병 정렬을 이용해 오름차순으로 정렬하기
-    int compare_A = 0, move_A = 0;
+    sorted = new itemType[N];
+
+    unsigned int compare_A = 0, move_A = 0;
     mergesort(A, 0, N-1, compare_A, move_A);
     cout << "SortedData A: ";
     for (int i = 0; i < 20; i++) {  // 정렬된 데이터들을 20개만 출력하기
@@ -95,7 +89,7 @@ int main() {
     }
     cout << endl;
 
-    int compare_B = 0, move_B = 0;
+    unsigned int compare_B = 0, move_B = 0;
     mergesort(B, 0, N-1, compare_B, move_B);
     cout << "SortedData B: ";
     for (int i = 0; i < 20; i++) {  // 정렬된 데이터들을 20개만 출력하기
@@ -110,6 +104,7 @@ int main() {
     // 메모리 해제
     delete [] A;
     delete [] B;
+    delete [] sorted;
     return 0;
 }
 
