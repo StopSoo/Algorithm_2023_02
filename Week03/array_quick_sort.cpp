@@ -74,7 +74,7 @@ int main() {
     for (int i = 0; i < N; i++) {   // 배열 A 초기화: 1부터 N까지 내림차순으로 push
         A[i] = value--;
     }
-    for (int i = 0; i < N; i++) {   // 배열 B 재배치: 1치터 N까지의 숫자들이 랜덤하게 재배치된 데이터 배열
+    for (int i = 0; i < N; i++) {   // 배열 B 재배치: 1부터 N까지의 숫자들이 랜덤하게 재배치된 데이터 배열
         x = rand() % N;
         y = rand() % N;
         swap(B[x], B[y]);
