@@ -14,10 +14,14 @@ itemType *b, *sum;
 itemType* CountSort(itemType *a, itemType *b, itemType *N, int n, unsigned int& c, unsigned int& m) {
     int i;
     for(i = 1; i <= n; i++) N[i] = 0;   // 초기화
-    for(i = 1; i <= n; i++) N[a[i]] = N[a[i]] + 1;  // 각 키의 개수
+    for(i = 1; i <= n; i++) {
+        N[a[i]] = N[a[i]] + 1;  // 각 키의 개수 체크
+        c++;    // 데이터 비교 연산 ..?
+    }
     for(i = 2; i <= n; i++) N[i] = N[i] + N[i-1];   // 키의 누적합
     for(i = n; i >= 1; i--) {   // 정렬 결과를 배열 b에 저장
         b[N[a[i]]] = a[i];
+        m++;    // 자료 이동 연산 ..?
         N[a[i]] = N[a[i]] - 1;  // N 배열의 값을 조정
     }
     return b;
