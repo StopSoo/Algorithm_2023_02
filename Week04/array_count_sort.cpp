@@ -16,12 +16,11 @@ itemType* CountSort(itemType *a, itemType *b, itemType *N, int n, unsigned int& 
     for(i = 1; i <= n; i++) N[i] = 0;   // 초기화
     for(i = 1; i <= n; i++) {
         N[a[i]] = N[a[i]] + 1;  // 각 키의 개수 체크
-        c++;    // 데이터 비교 연산 ..?
     }
     for(i = 2; i <= n; i++) N[i] = N[i] + N[i-1];   // 키의 누적합
     for(i = n; i >= 1; i--) {   // 정렬 결과를 배열 b에 저장
         b[N[a[i]]] = a[i];
-        m++;    // 자료 이동 연산 ..?
+        for (int j = 0; j < abs(i - N[a[i]]); j++) m++;  // 움직인 인덱스 만큼 자료 이동 연산 체크
         N[a[i]] = N[a[i]] - 1;  // N 배열의 값을 조정
     }
     return b;
@@ -32,7 +31,7 @@ int main() {
     int N;  // 배열의 크기
     cin >> N;   // 사용자로부터 배열의 크기 입력 받기
 
-    // 두 배열 생성 및 크기 동적 할당 (인덱스 1부터 시작)
+    // 세 배열 생성 및 크기 동적 할당 (인덱스 1부터 시작)
     int *A = new int[N+1];
     int *B = new int[N+1];
     int *C = new int[N+1];
