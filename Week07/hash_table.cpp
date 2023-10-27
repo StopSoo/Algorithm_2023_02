@@ -12,7 +12,6 @@
 #include <cstdlib>
 #include <ctime>
 #include <list>
-
 using namespace std;
 
 #define infoNIL 0
@@ -132,10 +131,9 @@ public:
     }
 };
 
-// 해시 테이블
 class HashTable {
 private:
-    int M;
+    int M;  // 해시 테이블의 크기
     vector<list<itemType>> table;
 
 public:
@@ -143,13 +141,25 @@ public:
         table.resize(M);
     }
 
-    void insert(itemType key) {
+    infoType insert(itemType key) {
+        int compare = 0;
+
         int hashValue = key % M;
-        table[hashValue].push_back(key);
+        list<itemType>::iterator it;
+        it = find(table[hashValue].begin(), table[hashValue].end(), key);
+        for (int i=0; i < table[hashValue].size(); i++)   // key를 찾는 횟수 만큼 비교 횟수 체크
+            compare++;
+        if (it == table[hashValue].end()) {     // 중복되는 값이 없다면
+            table[hashValue].push_back(key);    // 리스트에 값을 넣고
+            compare++;  // 비교 횟수 체크
+        } else {
+            compare++;  // 값 삽입은 안 하고 비교 횟수만 체크
+        }
+        return compare;
     }
 
     infoType search(itemType key) {
-        int hashValue = key % M;
+        int hashValue = key % M;    // 해시 테이블에서 찾을 인덱스 값
         int compare = 0;
 
         for (const auto& value : table[hashValue]) {
@@ -157,7 +167,6 @@ public:
             if (value == key)
                 return compare;
         }
-
         return compare;
     }
 };
@@ -167,40 +176,40 @@ int main() {
     cin >> N;
 
     srand(static_cast<unsigned int>(time(0)));
-
+    // 랜덤 값 생성
     set<itemType> uniqueValues;
     vector<itemType> values;
-
     while (uniqueValues.size() < N) {
-        itemType value = rand() % 10000 + 1;
+        itemType value = rand() % 20000 + 1;
         if (uniqueValues.find(value) == uniqueValues.end()) {
             uniqueValues.insert(value);
             values.push_back(value);
         }
     }
-
+    // 레드블랙트리, 해시 테이블 생성
     RBtree T3;
     HashTable hashTable11(11);
     HashTable hashTable101(101);
     HashTable hashTable1009(1009);
-
+    // 초기 구축 시 평균 비교 횟수 체크를 위한 변수들 초기화
     double initialCompareT3 = 0;
     double initialCompareHashTable11 = 0;
     double initialCompareHashTable101 = 0;
     double initialCompareHashTable1009 = 0;
-
+    // 각각에 대해 insert 함수 실행
     for (itemType value : values) {
         initialCompareT3 += T3.insert(value, infoNIL);
-        initialCompareHashTable11 += hashTable11.search(value);
-        initialCompareHashTable101 += hashTable101.search(value);
-        initialCompareHashTable1009 += hashTable1009.search(value);
+        initialCompareHashTable11 += hashTable11.insert(value);
+        initialCompareHashTable101 += hashTable101.insert(value);
+        initialCompareHashTable1009 += hashTable1009.insert(value);
     }
 
+    // 평균 비교 횟수 체크를 위한 변수들 초기화
     double searchCompareT3 = 0;
     double searchCompareHashTable11 = 0;
     double searchCompareHashTable101 = 0;
     double searchCompareHashTable1009 = 0;
-
+    // 각각에 대해 search 함수 실행
     for (int i = 0; i < 100; i++) {
         int randIndex = rand() % N;
         itemType searchNumber = values[randIndex];
@@ -210,7 +219,7 @@ int main() {
         searchCompareHashTable101 += hashTable101.search(searchNumber);
         searchCompareHashTable1009 += hashTable1009.search(searchNumber);
     }
-
+    // 출력
     cout << "T3의 구축 시 평균 비교 횟수 : " << (initialCompareT3 / N) << endl;
     cout << "Hash Table 크기가 11인 경우의 구축 시 평균 비교 횟수 : " << (initialCompareHashTable11 / N) << endl;
     cout << "Hash Table 크기가 101인 경우의 구축 시 평균 비교 횟수 : " << (initialCompareHashTable101 / N) << endl;

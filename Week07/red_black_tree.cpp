@@ -5,7 +5,6 @@
 //    아래의 출력 예제와 같이 출력하는 프로그램을 작성하시오.
 //    또한, T2와 T3의 평균 비교 횟수를 이용해 Red-Black 트리의 탐색 성능에 대해 논의하시오.
 //    (단, 삽입에 필요한 평균 비교 횟수는 각 자료 삽입을 위한 키의 비교 횟수 합계를 구한 다음에 전체 자료수 N으로 나누어서 계산함)
-
 #include <iostream>
 #include <set>
 #include <time.h>
@@ -19,6 +18,8 @@ using namespace std;
 #define red 1
 typedef int itemType;
 typedef double infoType;
+typedef int itemType;
+typedef double infoType;
 
 class BST {
 private:
@@ -26,85 +27,84 @@ private:
         itemType key;
         infoType info;
         struct node *l, *r;
-        node(itemType k, infoType i, struct node *ll, struct node *rr) {
+        node(itemType k, infoType i, struct node *ll, struct node *rr) {  // node의 생성자
             key = k;
             info = i;
             l = ll;
             r = rr;
         };
     };
+    // head : List의 시작 노드 포인터
+    // z : List의 끝 노드 포인터 – NULL에 해당
     node *head, *z;
 
 public:
-    BST() {
-        z = new node(0, infoNIL, nullptr, nullptr);
-        head = nullptr;
+    BST() {  // 생성자 -> 매개변수는 사용하지 않아 제거함
+        z = new node( 0, infoNIL, nullptr, nullptr);
+        head = nullptr; // 루트 노드는 없는 채로 시작
     }
-    ~BST() {};
-    infoType BSTinsert(itemType v, infoType info);
+    ~BST() {};    // 소멸자
+    void BSTinsert(itemType v, infoType info, int &compare);
     infoType BSTsearch(itemType v);
-    void inorderTraversal(vector<itemType>& tree);
+    void inorderTraversal(vector<itemType>& tree);   // 중위 순회 함수
 };
 
-infoType BST::BSTinsert(itemType v, infoType info) {
-    node *newNode = new node(v, info, z, z);
-    static node *temp = head;
-    int compare = 0;    // 비교 횟수
+void BST::BSTinsert(itemType v, infoType info, int &compare) {    // 삽입 함수
+    node *newNode = new node(v, info, z, z);    // 새 노드 생성
+    static node *temp = head;  // 노드 간 이동을 위한 노드, 삽입이 시작되면 head를 가리킴
 
     while (true) {
         compare++;
-        if (head == nullptr) {
+        if (head == nullptr) {  // 첫 삽입이라면 newNode를 head로 설정
             head = newNode;
-            break;
-        } else {
+            temp = head;
+            return;
+        } else {    // 이미 루트 노드가 존재한다면
             compare++;
-            if (v < temp->key) {
+            if (v < temp->key) {    // 찾고자 하는 값보다 루트 노드 값이 클 때
                 compare++;
-                if (temp->l == z) {
-                    temp->l = newNode;
-                    break;
+                if (temp->l == z) { // 왼쪽 노드가 NULL이라면
+                    temp->l = newNode;  // 왼쪽에 새 노드 연결
+                    return;
                 }
-                temp = temp->l;
-            } else {
+                temp = temp->l; // 왼쪽 노드가 NULL이 아니라면 NULL일 때까지 왼쪽 노드로 이동
+            } else {    // 찾고자 하는 값이 루트 노드 값보다 클 때
                 compare++;
-                if (temp->r == z) {
-                    temp->r = newNode;
-                    break;
+                if (temp->r == z) { // 오른쪽 노드가 NULL이라면
+                    temp->r = newNode;  // 오른쪽에 새 노드 연결
+                    return;
                 }
-                temp = temp->r;
+                temp = temp->r; // 오른쪽 노드가 NULL이 아니라면 NULL일 때까지 오른쪽 노드로 이동
             }
         }
     }
-    delete newNode;
-    delete temp;
-    return compare;
 }
 
-infoType BST::BSTsearch(itemType v) {
-    int compare = 0;    // 비교 횟수
-    node *current = head;
+infoType BST::BSTsearch(itemType v) {   // 탐색 함수
+    static int compare = 0;    // 비교 횟수 변수
+    node *current = head;   // head를 가리키고 직접 이동하는 노드
 
     while (current != z) {
         compare++;
-        if (v == current->key)
+        if (v == current->key) // 찾고자 하는 값을 찾았다면
             return compare;
-        else if (v < current->key)
+        else if (v < current->key) // 찾고자 하는 값보다 현재 노드 값이 크다면 왼쪽 탐색
             current = current->l;
-        else
+        else    // 찾고자 하는 값이 현재 노드 값보다 크다면 오른쪽 탐색
             current = current->r;
     }
-    return compare;
+    return compare;  // 비정상 종료
 }
 
-void BST::inorderTraversal(vector<itemType>& arr) { // 중위 순회
+void BST::inorderTraversal(vector<itemType>& arr) {
     node *current = head;
     node *child;
 
     while (current != z) {
-        if (current->l == z) {
-            arr.push_back(current->key);
+        if (current->l == z) {  // 현재 노드의 왼쪽 자식이 없을 때
+            arr.push_back(current->key);   // key를 push
             current = current->r;
-        } else {
+        } else {    // 현재 노드의 왼쪽 자식이 있다면
             child = current->l;
             while (child->r != z && child->r != current) {
                 child = child->r;
@@ -143,6 +143,7 @@ public:
         z = new node(0, infoNIL, black, 0, 0);
         z->l = z;
         z->r = z;
+        tail = z;
         head = new node(itemMIN, infoNIL, black, z, z);
     }
 
@@ -235,7 +236,7 @@ int main() {
     int N;
     cin >> N;
 
-    srand((unsigned int)time(0));
+    srand((unsigned int)time(0));   // 랜덤 값 seed 설정
 
     set<int> uniqueValues;
     vector<int> values;
@@ -248,22 +249,22 @@ int main() {
     }
 
     BST T1;
-    double initialCompareT1 = 0;
+    int initialCompareT1 = 0;
     for (int value : values) {
-        initialCompareT1 += T1.BSTinsert(value, infoNIL);
+        T1.BSTinsert(value, infoNIL, initialCompareT1);
     }
 
     vector<itemType> sortedData;
-    T1.inorderTraversal(sortedData);
+    T1.inorderTraversal(sortedData);    // 중위 순회
 
     BST T2;
-    double initialCompareT2 = 0;
+    int initialCompareT2 = 0;
     for (int value : sortedData) {
-        initialCompareT2 += T2.BSTinsert(value, infoNIL);
+        T2.BSTinsert(value, infoNIL, initialCompareT2);
     }
 
     RBtree T3;
-    double initialCompareT3 = 0;
+    int initialCompareT3 = 0;
     for (itemType value : sortedData) {
         initialCompareT3 += T3.insert(value, infoNIL);
     }
