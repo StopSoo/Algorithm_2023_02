@@ -12,13 +12,13 @@ using namespace std;
 vector<int> resultBS;
 vector<int> resultKMP;
 vector<int> resultRK;
-// 문자열 비교 횟수
+// 문자열 비교 횟수를 담을 변수
 int compareBS = 0;
 int compareKMP = 0;
 int compareRK = 0;
 
 void bruteSearch(string T, string P, int n, int m) {
-    // T : text string, P : pattern string, n : t 사이즈, m : p 사이즈
+    // T : text string, P : pattern string, n : T 사이즈, m : P 사이즈
     int i, j;
     for(i = 0; i <= n-m; i++) { // i : 비교를 시작하는 위치
         for (j = 0; j < m; j++) { // j : pattern에서 비교하는 위치
@@ -32,8 +32,8 @@ void bruteSearch(string T, string P, int n, int m) {
 }
 
 int failure[10];
-void fail(char *P) {    // failure 배열 초기화 함수
-    int j, n = strlen(P);
+void fail(string P) {    // failure 배열 초기화 함수
+    int j, n = P.size();
     failure[0] = -1;    // failure[0]은 무조건 -1을 가짐
 
     for (int i = 1; i < n; i++) {
@@ -50,49 +50,60 @@ void fail(char *P) {    // failure 배열 초기화 함수
     }
 }
 
-int kmpSearch(char *T, char *P) {
+void kmpSearch(string T, string P) {
     // T : text string, P : pattern string
     int i = 0, j = 0;
-    int lenS = strlen(T);   // text string의 길이
-    int lenP = strlen(P);   // pattern string의 길이
+    int lenS = T.size();   // text string의 길이
+    int lenP = P.size();   // pattern string의 길이
 
-    while (i < lenS && j < lenP) {
-        // 한 글자씩 비교
-        if (T[i] == P[j]) {
-            i++;
-            j++;
-        } else if (j == 0)  // 패턴 첫 글자부터 다르다면
-            i++;
-        else    // 같은 부분이 있다면
-            j = failure[j-1] + 1;
+    while (i < lenS) {
+        while(j < lenP) {
+            // 한 글자씩 비교
+            compareKMP++;
+            if (T[i] == P[j]) { // 패턴에서 한 글자와 문자열의 한 글자가 같다면
+                i++;
+                j++;
+            } else if (j == 0)  // 패턴 첫 글자부터 다르다면
+                i++;
+            else    // 같은 부분이 있다면
+                j = failure[j-1] + 1;
+        }
+
+        if (j == lenP) {    // 패턴의 마지막 문자까지 비교한다면
+            resultKMP.push_back(i-lenP);    // 시작 위치를 배열에 넣기
+            j = 0;  // 패턴 내 인덱스를 0으로 초기화
+        }
     }
-    return (j == lenP ? i-lenP : -1);
+
 }
 
-void rkSearch(char *T, char *P, int n, int m) {
+void rkSearch(string T, string P, int d, int q) {
     // 라빈 카프 알고리즘, 적절한 해시 사용
-    // T : text string, P : pattern string
-    auto initial = pow(n, m-1); // pow 함수의 반환값은 double형 !
-    int D = (int)initial % m;
+    // T : text string, P : pattern string, d : 알파벳 크기, q : 해시 함수에 의해 결정
+    int n = T.size();
+    int m = P.size();
+    auto initial = pow(d, m-1); // pow 함수의 반환값은 double형 !
+    int D = (int)initial % q;
 
     // Horner 방법 이용
-    int h, t = 0;
+    int h, t = 0;   // hash
     for (int i = 0; i <= m-1; i++) {
-        h = (n*h + P[i]) % m;
-        t = (n*t + T[i]) % m;
+        h = (d*h + P[i]) % d;
+        t = (d*t + T[i]) % d;
     }
     for (int s = 0; s < n-m+1; s++) {
         if (h == t) {
             for (int i = 0; i < m; i++) {
+                compareRK++;
                 if (P[i] != T[s+i])
                     break;
                 if (i == m)
-                    cout << "패턴이 위치 " << s << "에서 발생" << endl;
+                    resultRK.push_back(s);
             }
         }
         // t_s와 t_s+1 사이 관계를 이용한 점화식을 통해 다음 t 값을 계산
         if (s < n-m)
-            t = (n*(t - T[s]*D) + T[s+m]) % m;
+            t = (n*(t - T[s]*D) + T[s+m]) % q;
     }
 }
 
@@ -101,8 +112,13 @@ int main() {
     getline(cin, TS);
     getline(cin, PS);
 
+    // 알고리즘 실행
     bruteSearch(TS, PS, TS.size(), PS.size());
 
+    fail(PS);
+    kmpSearch(TS, PS);
+
+    rkSearch(TS, PS, 101, PS.size());
 
     // 출력
     for (int e : resultBS) {
