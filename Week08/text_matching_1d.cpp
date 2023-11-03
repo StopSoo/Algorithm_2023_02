@@ -4,18 +4,19 @@
 //    Rabin-Karp 알고리즘의 경우 Horner의 연산 방법을 사용했을 때와 그렇지 않았을 때 *연산의 수행 횟수를 각각 출력하세요.
 #include <iostream>
 #include <string>
-#include <cmath>
 #include <vector>
 using namespace std;
 
 // 패턴 문자열과 일치하는 시작점을 저장할 배열
 vector<int> resultBS;
 vector<int> resultKMP;
-vector<int> resultRK;
+vector<int> resultRKYes;
+vector<int> resultRKNo;
 // 문자열 비교 횟수를 담을 변수
 int compareBS = 0;
 int compareKMP = 0;
-int compareRK = 0;
+int compareRKYes = 0;
+int mulCountRK = 0;
 
 void bruteSearch(string T, string P, int n, int m) {
     // T : text string, P : pattern string, n : T 사이즈, m : P 사이즈
@@ -77,37 +78,84 @@ void kmpSearch(string T, string P) {
 
 }
 
-void rkSearch(string T, string P, int d, int q) {
-    // 라빈 카프 알고리즘, 적절한 해시 사용
-    // T : text string, P : pattern string, d : 알파벳 크기, q : 해시 함수에 의해 결정
-    int n = T.size();
-    int m = P.size();
-    auto initial = pow(d, m-1); // pow 함수의 반환값은 double형 !
-    int D = (int)initial % q;
-
-    // Horner 방법 이용
-    int h, t = 0;   // hash
-    for (int i = 0; i <= m-1; i++) {
-        h = (d*h + P[i]) % d;
-        t = (d*t + T[i]) % d;
+const int prime = 101;  // 소수
+void rkSearchHornerYes(string T, string P) {
+    // Horner 방법을 사용한 라빈 카프 알고리즘, 적절한 해시 사용
+    // T : text string, P : pattern string
+    int sizeT = T.length();
+    int sizeP = P.length();
+    int hashT = 0, hashP = 0, h = 1;
+    // h 값 계산하기
+    for (int i = 0; i < sizeP - 1; i++)
+        h = (h * prime) % prime;
+    // 해시 값 계산
+    for (int i = 0; i < sizeP; i++) {
+        hashT = (hashT * prime + T[i]) % prime;
+        hashP = (hashP * prime + P[i]) % prime;
     }
-    for (int s = 0; s < n-m+1; s++) {
-        if (h == t) {
-            for (int i = 0; i < m; i++) {
-                compareRK++;
-                if (P[i] != T[s+i])
+
+    for (int i = 0; i <= sizeT - sizeP; i++) {
+        if (hashT == hashP) {   // 해시 일치
+            bool find = true;
+            for (int j = 0; j < sizeP; j++) {
+                compareRKYes++;
+                if (T[i + j] != P[j]) { // 문자가 모두 일치하지 않는다면 실패
+                    find = false;
                     break;
-                if (i == m)
-                    resultRK.push_back(s);
+                }
+            }
+            if (find) {
+                // 패턴 문자열과 같은 부분 문자열을 찾았다면 인덱스를 배열에 삽입
+                resultRKYes.push_back(i);
             }
         }
-        // t_s와 t_s+1 사이 관계를 이용한 점화식을 통해 다음 t 값을 계산
-        if (s < n-m)
-            t = (n*(t - T[s]*D) + T[s+m]) % q;
+
+        if (i < sizeT - sizeP) {    // 다음 부분 문자열에 대해 해시 값을 계산한 후 진행
+            hashT = (prime * (hashT - T[i] * h) + T[i + sizeP]) % prime;
+            if (hashT < 0) {
+                hashT = (hashT + prime) % prime;
+            }
+        }
+    }
+}
+
+void rkSearchHornerNo(string T, string P) {
+    // Horner 방법을 사용하지 않은 라빈 카프 알고리즘, 적절한 해시 사용
+    // T : text string, P : pattern string
+    int sizeT = T.size();
+    int sizeP = P.size();
+    int hashT = 0, hashP = 0, power = 1;
+
+    for (int i = 0; i <= sizeT - sizeP; i++) {
+        if (i == 0) {
+            for (int j = 0; j < sizeP; j++) {
+                mulCountRK += 2;
+                hashT = hashT + T[sizeT - 1 - j] * power;
+                hashP = hashP + P[sizeP - 1 - j] * power;
+                if (j < sizeP - 1)
+                    power = power * 2;
+            }
+        } else {
+            mulCountRK++;
+            hashP = 2 * (hashP - T[i-1] * power) + T[sizeP - 1 + i];
+        }
+        if (hashT == hashP) {   // 해시 일치
+            bool find = true;
+            for (int j = 0; j < sizeP; j++) {
+                if (T[i + j] != P[j]) { // 문자가 모두 일치하지 않는다면 실패
+                    find = false;
+                    break;
+                }
+            }
+            if (find) {
+                resultRKNo.push_back(i);
+            }
+        }
     }
 }
 
 int main() {
+    // 입력
     string TS, PS;  // text string, pattern string -> 1차원 배열로 선언
     getline(cin, TS);
     getline(cin, PS);
@@ -118,24 +166,34 @@ int main() {
     fail(PS);
     kmpSearch(TS, PS);
 
-    rkSearch(TS, PS, 101, PS.size());
+    rkSearchHornerYes(TS, PS);
+
+    rkSearchHornerNo(TS, PS);
 
     // 출력
+    cout << "Brute-Force : ";
     for (int e : resultBS) {
         cout << e << ", ";
     }
     cout << compareBS << endl;
 
+    cout << "KMP : ";
     for (int e : resultKMP) {
         cout << e << ", ";
     }
     cout << compareKMP << endl;
 
-    for (int e : resultRK) {
+    cout << "Rabin-Karp with Horner: ";
+    for (int e : resultRKYes) {
         cout << e << ", ";
     }
-    cout << compareRK << endl;
+    cout << compareRKYes << endl;
 
+    cout << "Rabin-Karp without Horner: ";
+    for (int e : resultRKNo) {
+        cout << e << ", ";
+    }
+    cout << mulCountRK << endl;
 
     return 0;
 }
