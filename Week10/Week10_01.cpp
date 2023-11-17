@@ -129,7 +129,6 @@ int main() {
     srand((unsigned int)time(0));   // 배열 A 랜덤 배치를 위한 시드값 설정
     for (int i = 0; i < N; i++) {   // 배열 A 재배치: -50부터 50까지의 숫자들이 랜덤하게 재배치된 데이터 배열
         A[i] = rand() % 100 - 50;
-        cout << A[i] << " ";
     }
     cout << endl;
 
@@ -148,5 +147,6 @@ int main() {
     cout << "Dynamic Programming 결과 :\tsubarray 위치 = [" << get<0>(dpResult) << ", " << get<1>(dpResult);
     cout << "],\t\t 합 = " << get<2>(dpResult) << ",\t\t비교횟수 = " << dpCompare << endl;
 
+    delete A;
     return 0;
 }
