@@ -62,12 +62,12 @@ int main() {
         list[n2].push_back(n1);
     }
     // 함수 실행
-    fill(visited, visited + v + 1, false);
+    fill(visited, visited + v + 1, false);  // 방문 배열 초기화
     cout << "DFS : ";
     DFS(list, s);
     cout << endl;
 
-    fill(visited, visited + v + 1, false);
+    fill(visited, visited + v + 1, false);  // 방문 배열 초기화
     cout << "BFS : ";
     BFS(list, s);
 
