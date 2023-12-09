@@ -49,6 +49,7 @@ timeWeight = {
 }
 
 # 부스 간 이동 소요 시간
+# 부스 자기 자신에 대해서는 시간의 최소 값으로 고려되게 하지 않기 위해 inf 값을 사용
 movingWeightMatrix = [
     [float('inf'), 4, 5, 2, 4, 3, 4, 5, 5, 3, 3, 5, 1, 2, 2, 5, 3, 2, 2, 2],
     [4, float('inf'), 3, 4, 3, 3, 4, 4, 5, 2, 1, 1, 5, 5, 5, 2, 2, 2, 1, 4],
@@ -147,7 +148,7 @@ def heuristic1(adjList, givenTime):
             break
 
         open.append(nextNodeIndex)
-        totalWeight += timeWeight[nextNodeIndex] + adjList[currentNodeIndex][nextNodeIndex] # (다음 부스로의 이동 시간 + 다음 부스 이용 시간) 누적 (수정했음! 확인해야 함!)
+        totalWeight += timeWeight[nextNodeIndex] + adjList[currentNodeIndex][nextNodeIndex] # (다음 부스로의 이동 시간 + 다음 부스 이용 시간) 누적
         route.append(nextNodeIndex) # 방문 부스 리스트에 다음 부스 번호 추가
         close.add(nextNodeIndex)  # 다음 부스 방문 종료
         currentNodeIndex = nextNodeIndex # 현재 노드를 nextNode로 변경
@@ -212,8 +213,6 @@ def heuristic2(adjList):
         print('현재 부스 \'' + str(currentNodeIndex) + '\'번을 이용 중입니다.')
 
     return route, totalWeight
-
-
 
 
 # 사용자 입력 파트
