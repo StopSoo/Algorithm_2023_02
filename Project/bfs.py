@@ -2,36 +2,29 @@ from collections import deque
 import time
 
 def bfs(graph, start, limit_distance):
-    queue = deque([(start, [start], 0)])  # (current_node, path, current_distance)
+    queue = deque([(start, [start], 0)])  # (현재 노드, 경로 리스트, 현재까지의 거리)
 
-    max_nodes = ([], 0)  # (path, distance)
-    visited = set()
-    memo = {}
+    max_nodes = ([], 0)  # (경로 리스트, 거리)
+    visited = {}
 
     def state_hash(current, path):
         return current * 100 + hash(tuple(path))
 
     while queue:
-        current, path, distance = queue.popleft()
+        current, path, distance = queue.popleft()   # 큐에서 하나씩 빼서 값을 저장
 
         state = state_hash(current, path)
-        if state in visited:
+        if state in visited and visited[state] >= distance: # visited에 노드가 존재할 경우 pass
             continue
 
-        visited.add(state)
+        visited[state] = distance
 
         if distance <= limit_distance and len(path) > len(max_nodes[0]):
             max_nodes = (path, distance)
 
-        if state in memo and memo[state] >= distance:
-            continue
-        memo[state] = distance
-
-        if distance > limit_distance:
-            continue
-
         for neighbor, weight in graph[current].items():
-            if neighbor not in path and distance + weight <= limit_distance:
+            # 방문하지 않았고, 현재까지의 최대 거리보다 누적 거리가 작거나 같은 경우에만 큐에 추가
+            if neighbor not in path and distance + weight <= limit_distance and distance + weight >= max_nodes[1]:
                 queue.append((neighbor, path + [neighbor], distance + weight))
 
     return max_nodes
@@ -116,7 +109,7 @@ def do_bfs(limit_time):
     # 실행 시간 계산
     execution_time = end_time - start_time
 
-    # 결과 출력
+    # 출력
     start_node_name = node_names[start_node]
     shortest_path_names = ' -> '.join([node_names[node] for node in max_nodes[0]])
 
@@ -132,18 +125,4 @@ def do_bfs(limit_time):
         remaining_seconds = execution_time % 60
         print(f"Execution Time: {execution_time_in_minutes}분 {remaining_seconds:.2f}초")
 
-do_bfs(60)
-
-
-
-# def main():
-#     if len(sys.argv) != 2:
-#         print("Usage: python script_name.py <limit_time>")
-#         sys.exit(1)
-
-#     limit_time = int(sys.argv[1])
-
-#     do_bfs(limit_time)
-
-# if __name__ == "__main__":
-#     main()
+do_bfs(40)
