@@ -23,7 +23,7 @@ def bfs(graph, start, limit_distance):
             max_nodes = (path, distance)
 
         for neighbor, weight in graph[current].items():
-            # 방문하지 않았고, 현재까지의 최대 거리보다 누적 거리가 작거나 같은 경우에만 큐에 추가
+            # 방문하지 않았고, 현재까지의 최대 거리보다 누적 거리가 크거나 같은 경우에만 큐에 추가
             if neighbor not in path and distance + weight <= limit_distance and distance + weight >= max_nodes[1]:
                 queue.append((neighbor, path + [neighbor], distance + weight))
 
@@ -86,11 +86,11 @@ def do_bfs(limit_time):
     # 가중치 행렬을 원하는 크기로 자르기
     weight_matrix = [row[:matrix_len] for row in origin_weight_matrix[:matrix_len]]
 
-    def weight_matrix_to_adj_list(matrix):
+    def weightMatrixToAdjList(matrix):
         return {i: {j + 1: weight for j, weight in enumerate(row) if weight != 0} for i, row in enumerate(matrix, start=1)}
 
     # 가중치 행렬을 기반으로 인접 리스트 생성
-    adj_list = weight_matrix_to_adj_list(weight_matrix)
+    adj_list = weightMatrixToAdjList(weight_matrix)
 
     # 시작 시간
     start_time = time.time()
@@ -100,7 +100,7 @@ def do_bfs(limit_time):
     # 제한 거리
     limit_distance = limit_time
 
-    # 최대 노드 수를 방문하는 함수 호출
+    # bfs 함수 호출
     max_nodes = bfs(adj_list, start_node, limit_distance)
 
     # 종료 시간
