@@ -1,4 +1,6 @@
 import random
+import time
+import sys
 
 # 부스 이름 딕셔너리
 name = {
@@ -96,6 +98,9 @@ resultAdjList = adjlist(movingWeightMatrix)
 
 # 사용자가 1번을 선택했을 때 실행되는 함수
 def heuristic1(adjList, givenTime):
+    # 시작 시간
+    start_time = time.time()
+
     route = []  # 최종 경로
     open = []
     close = set()
@@ -154,11 +159,20 @@ def heuristic1(adjList, givenTime):
         currentNodeIndex = nextNodeIndex # 현재 노드를 nextNode로 변경
         print('현재 부스 \'' + str(currentNodeIndex) + '\'번을 이용 중입니다.')
 
-    return route
+        # 종료 시간
+        end_time = time.time()
+
+        # 실행 시간 계산
+        execution_time = end_time - start_time
+
+    return route, execution_time
 
 
 # 사용자가 2번을 선택했을 때 실행되는 함수
 def heuristic2(adjList):
+    # 시작 시간
+    start_time = time.time()
+
     route = []  # 최종 경로
     open = []
     close = set()
@@ -212,23 +226,30 @@ def heuristic2(adjList):
         currentNodeIndex = nextNodeIndex # 현재 노드를 nextNode로 변경
         print('현재 부스 \'' + str(currentNodeIndex) + '\'번을 이용 중입니다.')
 
-    return route, totalWeight
+        # 종료 시간
+        end_time = time.time()
 
+        # 실행 시간 계산
+        execution_time = end_time - start_time
 
-# 사용자 입력 파트
-print('아래 두 가지 케이스 중 하나를 선택해주세요.')
-ansCase = input('1. 주어진 시간 내 최대 개수의 부스 돌기  |  2. 모든 부스를 최소 시간 안에 돌기 : ')
-if ansCase == '1':
-    ansTime = int(input('주어진 시간을 입력해주세요(단위: 분) : '))
-    route = heuristic1(resultAdjList, ansTime)
-    print('사용자가 최소 시간으로 모든 부스를 방문할 수 있는 부스 경로는 <-', end=' ')
-    for number in route:
-        print(name[number] + ' - ', end='')
-    print('> 입니다.')
-else:
-    route, ansTime = heuristic2(resultAdjList)
-    print('사용자가 최소 시간으로 모든 부스를 방문할 수 있는 부스 경로는 <-', end=' ')
-    for number in route:
-        print(name[number] + ' - ', end='')
-    print('> 입니다.')
-    print('최소 시간은 ' + str(ansTime) + '분입니다.')
+    return route, totalWeight, execution_time
+
+def do_a_star(limit_time, select_option):
+    
+    if select_option == 1:
+        route, execution_time = heuristic1(resultAdjList, limit_time)
+        print('사용자가 주어진 시간 내 최대 개수의 부스를 방문할 수 있는 부스 경로는 <-', end=' ')
+        for number in route:
+            print(name[number] + ' - ', end='')
+        print('> 입니다.')
+        print('최소 시간은 ' + str(limit_time) + '분입니다.')
+        print(f'Execution Time: {execution_time:.5f}초\n')
+
+    elif select_option == 2:
+        route, totalTime, execution_time = heuristic2(resultAdjList)
+        print('사용자가 최소 시간으로 모든 부스를 방문할 수 있는 부스 경로는 <-', end=' ')
+        for number in route:
+            print(name[number] + ' - ', end='')
+        print('> 입니다.')
+        print('최소 시간은 ' + str(totalTime) + '분입니다.')
+        print(f'Execution Time: {execution_time:.5f}초\n')

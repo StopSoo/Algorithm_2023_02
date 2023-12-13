@@ -1,5 +1,6 @@
 from collections import deque
 import time
+import sys
 
 def bfs(graph, start, limit_distance):
     queue = deque([(start, [start], 0)])  # (현재 노드, 경로 리스트, 현재까지의 거리)
@@ -88,7 +89,7 @@ def do_bfs(limit_time):
 
     def weightMatrixToAdjList(matrix):
         return {i: {j + 1: weight for j, weight in enumerate(row) if weight != 0} for i, row in enumerate(matrix, start=1)}
-
+    
     # 가중치 행렬을 기반으로 인접 리스트 생성
     adj_list = weightMatrixToAdjList(weight_matrix)
 
@@ -119,10 +120,19 @@ def do_bfs(limit_time):
 
     # 실행 시간 출력
     if execution_time < 60:
-        print(f"Execution Time: {execution_time:.2f}초")
+        print(f"Execution Time: {execution_time:.5f}초")
     else:
         execution_time_in_minutes = execution_time // 60
         remaining_seconds = execution_time % 60
         print(f"Execution Time: {execution_time_in_minutes}분 {remaining_seconds:.2f}초")
 
-do_bfs(40)
+def main():
+    if len(sys.argv) != 2:
+        print("Usage: python bfs_algorithm.py <limit_time>")
+        sys.exit(1)
+
+    limit_time = int(sys.argv[1])
+
+    do_bfs(limit_time)
+
+
